@@ -21,7 +21,7 @@ export function Navbar() {
 
   const links = user
     ? user.userRole === 'student'
-      ? navLinks
+      ? [...navLinks, { href: '/my-courses', label: 'My Courses' }]
       : [...navLinks, { href: '/manage', label: 'Manage' }]
     : navLinks;
 

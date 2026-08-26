@@ -17,12 +17,15 @@ import { useAuth } from '@/components/providers/auth-provider';
 import { CourseFormDialog } from '@/components/manage/course-form-dialog';
 import { DeleteButton } from '@/components/manage/delete-button';
 import { LessonFormDialog } from '@/components/manage/lesson-form-dialog';
+import { QuizFormDialog } from '@/components/manage/quiz-form-dialog';
 import {
   deleteCourse,
   deleteLesson,
+  deleteQuiz,
   fetchManageCourses,
   type ManageCourse,
   type ManageLesson,
+  type ManageQuiz,
 } from '@/lib/manage';
 
 export function ManageContent() {
@@ -40,6 +43,11 @@ export function ManageContent() {
     course: ManageCourse | null;
     lesson: ManageLesson | null;
   }>({ open: false, course: null, lesson: null });
+  const [quizDialog, setQuizDialog] = useState<{
+    open: boolean;
+    course: ManageCourse | null;
+    quiz: ManageQuiz | null;
+  }>({ open: false, course: null, quiz: null });
 
   const reload = useCallback(async () => {
     try {
@@ -61,6 +69,11 @@ export function ManageContent() {
 
   async function handleDeleteLesson(documentId: string) {
     await deleteLesson(documentId);
+    await reload();
+  }
+
+  async function handleDeleteQuiz(documentId: string) {
+    await deleteQuiz(documentId);
     await reload();
   }
 
@@ -188,6 +201,48 @@ export function ManageContent() {
                         Add lesson
                       </Button>
                     </div>
+
+                    <div className="mt-6">
+                      <h3 className="mb-2 text-sm font-medium">Quizzes</h3>
+                      {course.quizzes.length === 0 ? (
+                        <p className="mb-2 text-sm text-muted-foreground">No quizzes yet.</p>
+                      ) : (
+                        <ul className="mb-2 flex flex-col divide-y rounded-lg border">
+                          {course.quizzes.map((quiz) => (
+                            <li
+                              key={quiz.documentId}
+                              className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm"
+                            >
+                              <span className="flex min-w-0 items-center gap-3">
+                                <span className="truncate">{quiz.title}</span>
+                                <Badge variant="outline" className="font-normal">
+                                  {quiz.questions.length} questions
+                                </Badge>
+                              </span>
+                              <span className="flex shrink-0 items-center gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setQuizDialog({ open: true, course, quiz })}
+                                >
+                                  <Pencil className="size-3.5" />
+                                  Edit
+                                </Button>
+                                <DeleteButton onConfirm={() => handleDeleteQuiz(quiz.documentId)} />
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setQuizDialog({ open: true, course, quiz: null })}
+                      >
+                        <Plus className="size-3.5" />
+                        Add quiz
+                      </Button>
+                    </div>
                   </CardContent>
                 )}
               </Card>
@@ -208,6 +263,13 @@ export function ManageContent() {
         courseDocumentId={lessonDialog.course?.documentId ?? ''}
         lesson={lessonDialog.lesson}
         nextOrder={(lessonDialog.course?.lessons.length ?? 0) + 1}
+        onSaved={reload}
+      />
+      <QuizFormDialog
+        open={quizDialog.open}
+        onOpenChange={(open) => setQuizDialog((prev) => ({ ...prev, open }))}
+        courseDocumentId={quizDialog.course?.documentId ?? ''}
+        quiz={quizDialog.quiz}
         onSaved={reload}
       />
     </div>

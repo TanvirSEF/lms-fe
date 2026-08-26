@@ -8,6 +8,19 @@ export type ManageLesson = {
   order: number;
 };
 
+export type ManageQuizQuestion = {
+  documentId: string;
+  text: string;
+  options: string[];
+  correctIndex: number;
+};
+
+export type ManageQuiz = {
+  documentId: string;
+  title: string;
+  questions: ManageQuizQuestion[];
+};
+
 export type ManageCourse = {
   documentId: string;
   title: string;
@@ -15,6 +28,13 @@ export type ManageCourse = {
   coverUrl: string | null;
   instructor: { username: string } | null;
   lessons: ManageLesson[];
+  quizzes: ManageQuiz[];
+};
+
+export type QuizInput = {
+  title: string;
+  course?: string;
+  questions: { text: string; options: string[]; correctIndex: number }[];
 };
 
 export type CourseInput = {
@@ -58,4 +78,16 @@ export function updateLesson(documentId: string, input: LessonInput) {
 
 export function deleteLesson(documentId: string) {
   return api(`/lessons/${documentId}`, { method: 'DELETE' });
+}
+
+export function createQuiz(input: QuizInput) {
+  return api('/quizzes', { method: 'POST', body: JSON.stringify(input) });
+}
+
+export function updateQuiz(documentId: string, input: QuizInput) {
+  return api(`/quizzes/${documentId}`, { method: 'PUT', body: JSON.stringify(input) });
+}
+
+export function deleteQuiz(documentId: string) {
+  return api(`/quizzes/${documentId}`, { method: 'DELETE' });
 }

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { BookOpen, User } from 'lucide-react';
 
+import { EnrollSection } from '@/components/courses/enroll-section';
 import { LessonList } from '@/components/courses/lesson-list';
 import { getCourse } from '@/lib/courses';
 
@@ -34,6 +35,7 @@ export default async function CourseDetailPage({
       {course.description && (
         <p className="mt-6 leading-relaxed text-muted-foreground">{course.description}</p>
       )}
+      <EnrollSection courseDocumentId={course.documentId} />
       <h2 className="mb-3 mt-10 font-medium">Lessons</h2>
       <LessonList lessons={course.lessons} />
     </div>
