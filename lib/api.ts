@@ -34,7 +34,7 @@ export function setToken(token: string | null) {
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   const token = getToken();
-  if (token) {
+  if (token && !path.startsWith('/auth/')) {
     headers.Authorization = `Bearer ${token}`;
   }
 
