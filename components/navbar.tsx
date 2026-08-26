@@ -19,6 +19,12 @@ export function Navbar() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
+  const links = user
+    ? user.userRole === 'student'
+      ? navLinks
+      : [...navLinks, { href: '/manage', label: 'Manage' }]
+    : navLinks;
+
   return (
     <header className="border-b">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
@@ -28,7 +34,7 @@ export function Navbar() {
             LMS
           </Link>
           <nav className="flex items-center gap-4 text-sm text-muted-foreground">
-            {navLinks.map((link) => (
+            {links.map((link) => (
               <Link key={link.href} href={link.href} className="hover:text-foreground">
                 {link.label}
               </Link>
