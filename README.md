@@ -1,21 +1,51 @@
-# Next.js template
+# LMS Frontend
 
-This is a Next.js template with shadcn/ui.
+Next.js frontend for a Learning Management System: browse and enroll in courses, learn lesson by lesson, track progress, take auto-graded quizzes and read the blog.
 
-## Adding components
+- Live app: https://lms-fe-nine-ivory.vercel.app
+- Backend repo: https://github.com/TanvirSEF/lms-be
+- Backend live: https://lms-be-production-39f4.up.railway.app
 
-To add components to your app, run the following command:
+## Tech
+
+- Next.js (App Router, TypeScript, server components for public pages)
+- Tailwind CSS + shadcn/ui
+- lucide-react icons
+
+## Features
+
+- Auth: register (joins as student), login, role-aware navbar, protected pages
+- Courses: public browse + detail (SSR), enroll flow
+- Learning: course player with lesson sequence, text and video lessons, mark complete
+- Progress: per course percent, persisted per student, visible in My Courses
+- Quizzes: MCQ taking, instant score, per question review, retake, attempt history
+- Manage panel: courses, lessons and quizzes CRUD for instructors (own) and admins / CMs (all)
+- Blog: published list + single post (SSR, public), draft / publish workflow for admins / CMs
+- Admin panel: platform stats and user role management (admin only)
+
+## Pages
+
+| Route | Description |
+| --- | --- |
+| `/` | landing |
+| `/courses`, `/courses/[documentId]` | public course browse and detail |
+| `/my-courses`, `/my-courses/[documentId]` | enrolled courses and the course player |
+| `/my-courses/[documentId]/quiz/[quizDocumentId]` | quiz taking and results |
+| `/manage` | course / lesson / quiz management |
+| `/blog`, `/blog/[documentId]` | public blog |
+| `/blog/manage` | blog management (admin / CM) |
+| `/admin` | platform stats + user roles (admin) |
+
+## Run locally
 
 ```bash
-npx shadcn@latest add button
+pnpm install
+cp .env.example .env.local
+pnpm dev
 ```
 
-This will place the ui components in the `components` directory.
+Set `NEXT_PUBLIC_STRAPI_URL` in `.env.local` to the Strapi URL. The app runs on http://localhost:3000.
 
-## Using components
+## Demo accounts
 
-To use the components in your app, import them as follows:
-
-```tsx
-import { Button } from "@/components/ui/button";
-```
+All passwords are `test1234`: `admin1`, `cm1`, `instructor1`, `ltest1`, `student1`, `student2`. See the backend README for what each role can do.
