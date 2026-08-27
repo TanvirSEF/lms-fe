@@ -12,6 +12,7 @@ import { useAuth } from '@/components/providers/auth-provider';
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/courses', label: 'Courses' },
+  { href: '/blog', label: 'Blog' },
   { href: '/dashboard', label: 'Dashboard' },
 ];
 
@@ -19,11 +20,23 @@ export function Navbar() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const links = user
-    ? user.userRole === 'student'
-      ? [...navLinks, { href: '/my-courses', label: 'My Courses' }]
-      : [...navLinks, { href: '/manage', label: 'Manage' }]
-    : navLinks;
+  let links = navLinks;
+
+  if (user && user.userRole === 'student') {
+    links = [...links, { href: '/my-courses', label: 'My Courses' }];
+  }
+
+  if (user && user.userRole !== 'student') {
+    links = [...links, { href: '/manage', label: 'Manage' }];
+  }
+
+  if (user && (user.userRole === 'admin' || user.userRole === 'content_manager')) {
+    links = [...links, { href: '/blog/manage', label: 'Blog admin' }];
+  }
+
+  if (user && user.userRole === 'admin') {
+    links = [...links, { href: '/admin', label: 'Admin' }];
+  }
 
   return (
     <header className="border-b">
