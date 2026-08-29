@@ -2,9 +2,8 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GraduationCap, LogIn, LogOut, UserPlus } from 'lucide-react';
+import { ArrowRight, GraduationCap, LogIn, LogOut, UserPlus } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { LinkButton } from '@/components/link-button';
 import { useAuth } from '@/components/providers/auth-provider';
@@ -13,30 +12,11 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/courses', label: 'Courses' },
   { href: '/blog', label: 'Blog' },
-  { href: '/dashboard', label: 'Dashboard' },
 ];
 
 export function Navbar() {
   const { user, logout } = useAuth();
   const router = useRouter();
-
-  let links = navLinks;
-
-  if (user && user.userRole === 'student') {
-    links = [...links, { href: '/my-courses', label: 'My Courses' }];
-  }
-
-  if (user && user.userRole !== 'student') {
-    links = [...links, { href: '/manage', label: 'Manage' }];
-  }
-
-  if (user && (user.userRole === 'admin' || user.userRole === 'content_manager')) {
-    links = [...links, { href: '/blog/manage', label: 'Blog admin' }];
-  }
-
-  if (user && user.userRole === 'admin') {
-    links = [...links, { href: '/admin', label: 'Admin' }];
-  }
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
@@ -47,20 +27,24 @@ export function Navbar() {
             LMS
           </Link>
           <nav className="flex items-center gap-4 text-sm text-muted-foreground">
-            {links.map((link) => (
+            {navLinks.map((link) => (
               <Link key={link.href} href={link.href} className="hover:text-foreground">
                 {link.label}
               </Link>
             ))}
           </nav>
         </div>
+
         <div className="flex items-center gap-2">
           {user ? (
             <>
-              <Badge variant="outline" className="capitalize">
-                {user.userRole.replaceAll('_', ' ')}
-              </Badge>
-              <span className="text-sm text-muted-foreground">{user.username}</span>
+              <span className="hidden text-sm text-muted-foreground sm:block">
+                {user.username}
+              </span>
+              <LinkButton href="/dashboard" size="sm">
+                Go to app
+                <ArrowRight className="size-4" />
+              </LinkButton>
               <Button
                 variant="ghost"
                 size="icon"

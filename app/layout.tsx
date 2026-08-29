@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, DM_Sans } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/components/providers/auth-provider"
-import { Navbar } from "@/components/navbar"
 import { cn } from "@/lib/utils";
 
 const dmSans = DM_Sans({subsets:['latin'],variable:'--font-sans'})
@@ -26,10 +25,7 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <AuthProvider>
-            <Navbar />
-            <main>{children}</main>
-          </AuthProvider>
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
       </body>
     </html>

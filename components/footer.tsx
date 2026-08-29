@@ -5,7 +5,7 @@ export function Footer() {
     <footer className="border-t">
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row">
         <p className="text-sm text-muted-foreground">
-          LMS — a learning platform demo
+          LMS — learn at your own pace
         </p>
         <nav className="flex items-center gap-5 text-sm text-muted-foreground">
           <Link href="/courses" className="hover:text-foreground">
