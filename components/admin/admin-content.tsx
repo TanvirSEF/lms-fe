@@ -1,14 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { BookOpen, ClipboardCheck, GraduationCap, Loader2, Users } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -25,9 +19,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useAuth } from '@/components/providers/auth-provider';
-import { RoleChart } from '@/components/admin/role-chart';
 import { UserRole } from '@/lib/api';
-import { fetchStats, fetchUsers, setUserRole, type AdminStats, type AdminUser } from '@/lib/admin';
+import { fetchUsers, setUserRole, type AdminUser } from '@/lib/admin';
 
 const roleLabels: Record<UserRole, string> = {
   admin: 'Admin',
@@ -40,13 +33,11 @@ const roleOptions = Object.entries(roleLabels) as [UserRole, string][];
 
 export function AdminContent() {
   const { user } = useAuth();
-  const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<AdminUser[] | null>(null);
   const [error, setError] = useState('');
 
   const reload = useCallback(async () => {
-    const [statsData, usersData] = await Promise.all([fetchStats(), fetchUsers()]);
-    setStats(statsData);
+    const usersData = await fetchUsers();
     setUsers(usersData);
   }, []);
 
@@ -65,7 +56,7 @@ export function AdminContent() {
     }
   }
 
-  if (stats === null || users === null) {
+  if (users === null) {
     return (
       <div className="flex min-h-[60svh] items-center justify-center">
         <Loader2 className="size-6 animate-spin text-muted-foreground" />
@@ -73,56 +64,17 @@ export function AdminContent() {
     );
   }
 
-  const statCards = [
-    { label: 'Users', value: stats.users.total, hint: `${stats.users.byRole.student} students · ${stats.users.byRole.instructor} instructors · ${stats.users.byRole.content_manager} CMs · ${stats.users.byRole.admin} admins`, icon: Users },
-    { label: 'Courses', value: stats.courses, hint: `${stats.lessons} lessons`, icon: BookOpen },
-    { label: 'Enrollments', value: stats.enrollments, hint: `${stats.quizzes} quizzes`, icon: GraduationCap },
-    { label: 'Blog posts', value: stats.posts.total, hint: `${stats.posts.published} published · ${stats.posts.draft} draft`, icon: ClipboardCheck },
-  ];
-
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
+    <div className="mx-auto max-w-4xl px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-2xl font-medium tracking-tight">Admin panel</h1>
+        <h1 className="text-2xl font-medium tracking-tight">User management</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Platform overview and user role management.
+          Change any user role — it takes effect on their next request.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {statCards.map((card) => (
-          <Card key={card.label}>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {card.label}
-                </CardTitle>
-                <card.icon className="size-4 text-muted-foreground" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-medium tabular-nums">{card.value}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{card.hint}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="mt-10 grid gap-4 lg:grid-cols-[380px_1fr]">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Users by role
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <RoleChart byRole={stats.users.byRole} />
-          </CardContent>
-        </Card>
-      </div>
-
-      <h2 className="mb-3 mt-10 font-medium">Users</h2>
       {error && <p className="mb-3 text-sm text-destructive">{error}</p>}
+
       <div className="rounded-lg border">
         <Table>
           <TableHeader>

@@ -1,7 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { Loader2, ShieldCheck, ShieldX } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import {
+  BookOpen,
+  ClipboardCheck,
+  GraduationCap,
+  Loader2,
+  ShieldCheck,
+  ShieldX,
+  Users,
+} from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,8 +20,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { LinkButton } from '@/components/link-button';
+import { RoleChart } from '@/components/admin/role-chart';
 import { useAuth } from '@/components/providers/auth-provider';
 import { api } from '@/lib/api';
+import { fetchStats, type AdminStats } from '@/lib/admin';
 
 type AccessState = 'idle' | 'checking' | 'allowed' | 'denied';
 
@@ -21,12 +32,101 @@ const roleHints: Record<string, string> = {
   student: 'Pick a course, enroll and start completing lessons — your progress is saved automatically.',
   instructor: 'Create courses, add lessons and build quizzes from the Manage section.',
   content_manager: 'Curate every course and publish blog posts from the sidebar.',
-  admin: 'Oversee the platform from the Admin panel and assign user roles.',
+  admin: 'Platform overview is below. Manage user roles from the Admin panel.',
 };
+
+function AdminOverview({ stats }: { stats: AdminStats }) {
+  const statCards = [
+    {
+      label: 'Users',
+      value: stats.users.total,
+      hint: `${stats.users.byRole.student} students · ${stats.users.byRole.instructor} instructors · ${stats.users.byRole.content_manager} CMs · ${stats.users.byRole.admin} admins`,
+      icon: Users,
+    },
+    {
+      label: 'Courses',
+      value: stats.courses,
+      hint: `${stats.lessons} lessons`,
+      icon: BookOpen,
+    },
+    {
+      label: 'Enrollments',
+      value: stats.enrollments,
+      hint: `${stats.quizzes} quizzes`,
+      icon: GraduationCap,
+    },
+    {
+      label: 'Blog posts',
+      value: stats.posts.total,
+      hint: `${stats.posts.published} published · ${stats.posts.draft} draft`,
+      icon: ClipboardCheck,
+    },
+  ];
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {statCards.map((card) => (
+          <Card key={card.label}>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  {card.label}
+                </CardTitle>
+                <card.icon className="size-4 text-muted-foreground" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-medium tabular-nums">{card.value}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{card.hint}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[380px_1fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Users by role
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RoleChart byRole={stats.users.byRole} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">User management</CardTitle>
+            <CardDescription>
+              Change any user role from the Admin panel. Your own role is
+              protected so an admin cannot lock themselves out.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LinkButton href="/admin" variant="outline">
+              Open Admin panel
+            </LinkButton>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
 
 export function DashboardContent() {
   const { user } = useAuth();
   const [access, setAccess] = useState<AccessState>('idle');
+  const [stats, setStats] = useState<AdminStats | null>(null);
+
+  useEffect(() => {
+    if (user?.userRole === 'admin') {
+      fetchStats()
+        .then(setStats)
+        .catch(() => setStats(null));
+    }
+  }, [user]);
 
   async function checkAccess() {
     setAccess('checking');
@@ -39,7 +139,7 @@ export function DashboardContent() {
   }
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-12">
+    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-12">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-medium tracking-tight">Hello, {user?.username}</h1>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -52,6 +152,14 @@ export function DashboardContent() {
           {user ? roleHints[user.userRole] : ''}
         </p>
       </div>
+
+      {user?.userRole === 'admin' && (
+        stats ? <AdminOverview stats={stats} /> : (
+          <div className="flex justify-center py-10">
+            <Loader2 className="size-6 animate-spin text-muted-foreground" />
+          </div>
+        )
+      )}
 
       <Card>
         <CardHeader>
