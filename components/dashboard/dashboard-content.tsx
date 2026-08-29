@@ -8,13 +8,10 @@ import {
   GraduationCap,
   Loader2,
   PencilLine,
-  ShieldCheck,
-  ShieldX,
   Users,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -26,12 +23,9 @@ import { Progress } from '@/components/ui/progress';
 import { LinkButton } from '@/components/link-button';
 import { RoleChart } from '@/components/admin/role-chart';
 import { useAuth } from '@/components/providers/auth-provider';
-import { api } from '@/lib/api';
 import { fetchStats, type AdminStats } from '@/lib/admin';
 import { fetchManageCourses, type ManageCourse } from '@/lib/manage';
 import { fetchMyCourses, type EnrolledCourse } from '@/lib/student';
-
-type AccessState = 'idle' | 'checking' | 'allowed' | 'denied';
 
 const roleHints: Record<string, string> = {
   student: 'Pick a course, enroll and start completing lessons — your progress is saved automatically.',
@@ -268,7 +262,6 @@ function ManageOverview() {
 
 export function DashboardContent() {
   const { user } = useAuth();
-  const [access, setAccess] = useState<AccessState>('idle');
   const [stats, setStats] = useState<AdminStats | null>(null);
 
   useEffect(() => {
@@ -278,16 +271,6 @@ export function DashboardContent() {
         .catch(() => setStats(null));
     }
   }, [user]);
-
-  async function checkAccess() {
-    setAccess('checking');
-    try {
-      await api('/rbac-check');
-      setAccess('allowed');
-    } catch {
-      setAccess('denied');
-    }
-  }
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-12">
@@ -316,41 +299,6 @@ export function DashboardContent() {
 
       {(user?.userRole === 'instructor' || user?.userRole === 'content_manager') && (
         <ManageOverview />
-      )}
-
-      {user?.userRole === 'student' && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Access check</CardTitle>
-            <CardDescription>
-              Calls GET /api/rbac-check on the backend. Only instructor, content
-              manager and admin roles pass — students are rejected with 403 by
-              the server, not by hiding the button.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <Button onClick={checkAccess} disabled={access === 'checking'} className="w-fit">
-              {access === 'checking' ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <ShieldCheck className="size-4" />
-              )}
-              Check my access
-            </Button>
-            {access === 'allowed' && (
-              <p className="flex items-center gap-2 text-sm text-green-600">
-                <ShieldCheck className="size-4" />
-                Allowed. The backend accepted your role.
-              </p>
-            )}
-            {access === 'denied' && (
-              <p className="flex items-center gap-2 text-sm text-destructive">
-                <ShieldX className="size-4" />
-                Denied. The backend returned 403 for your role.
-              </p>
-            )}
-          </CardContent>
-        </Card>
       )}
     </div>
   );
