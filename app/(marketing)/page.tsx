@@ -3,6 +3,7 @@ import {
   ArrowRight,
   BookOpen,
   CheckCircle2,
+  Circle,
   ClipboardCheck,
   GraduationCap,
   PenLine,
@@ -23,9 +24,6 @@ const SPLIT_IMAGE_1 =
 
 const SPLIT_IMAGE_2 =
   "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1000&q=80&auto=format&fit=crop"
-
-const PREVIEW_IMAGE =
-  "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&q=80&auto=format&fit=crop"
 
 const steps = [
   {
@@ -276,22 +274,68 @@ export default async function Home() {
             Lessons, progress and quizzes in one focused screen.
           </p>
         </div>
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden rounded-xl border bg-background shadow-sm">
+
+        <div
+          className="animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden rounded-xl border bg-background shadow-sm"
+          role="img"
+          aria-label="Illustration of the course player"
+        >
           <div className="flex items-center gap-1.5 border-b bg-muted/50 px-4 py-2.5">
             <span className="size-2.5 rounded-full bg-foreground/15" />
             <span className="size-2.5 rounded-full bg-foreground/15" />
             <span className="size-2.5 rounded-full bg-foreground/15" />
             <span className="ml-3 rounded-md bg-background px-2.5 py-0.5 text-xs text-muted-foreground">
-              lms-fe-nine-ivory.vercel.app
+              The course player
             </span>
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={PREVIEW_IMAGE}
-            alt="The course player showing lessons and progress"
-            className="aspect-[16/9] w-full object-cover"
-          />
+
+          <div className="grid gap-0 sm:grid-cols-[220px_1fr]">
+            <div className="flex flex-col gap-1 border-b p-3 sm:border-b-0 sm:border-r">
+              {[
+                { title: 'Getting Started', done: true },
+                { title: 'Routing Basics', done: true },
+                { title: 'Data Fetching', done: true, active: true },
+                { title: 'Server Actions', done: false },
+                { title: 'Deployment', done: false },
+              ].map((lesson) => (
+                <div
+                  key={lesson.title}
+                  className={`flex items-center gap-2.5 rounded-md px-2.5 py-2 text-xs ${
+                    lesson.active ? 'bg-muted font-medium' : 'text-muted-foreground'
+                  }`}
+                >
+                  {lesson.done ? (
+                    <CheckCircle2 className="size-3.5 shrink-0 text-primary" />
+                  ) : (
+                    <Circle className="size-3.5 shrink-0" />
+                  )}
+                  <span className="truncate">{lesson.title}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-4 p-5">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>3/5 lessons</span>
+                <span className="tabular-nums">60%</span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                <div className="h-full w-[60%] rounded-full bg-primary" />
+              </div>
+              <div className="mt-2 h-4 w-2/5 rounded bg-foreground/80" />
+              <div className="flex flex-col gap-2">
+                <div className="h-2 w-full rounded bg-muted" />
+                <div className="h-2 w-11/12 rounded bg-muted" />
+                <div className="h-2 w-4/5 rounded bg-muted" />
+              </div>
+              <div className="mt-3 flex w-fit items-center gap-2 rounded-lg bg-primary px-3.5 py-2 text-xs font-medium text-primary-foreground">
+                <Circle className="size-3.5" />
+                Mark as complete
+              </div>
+            </div>
+          </div>
         </div>
+
         <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
           <span className="flex items-center gap-2">
             <PlayCircle className="size-4" />
