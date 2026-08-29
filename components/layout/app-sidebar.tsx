@@ -75,12 +75,12 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex h-14 items-center gap-2 border-b px-5 font-medium">
+      <div className="flex h-14 shrink-0 items-center gap-2 border-b px-5 font-medium">
         <GraduationCap className="size-5" />
         LMS
       </div>
 
-      <nav className="flex flex-1 flex-col gap-1 p-3">
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
         {items.map((item) => (
           <Link
             key={item.href}
@@ -98,7 +98,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
         ))}
       </nav>
 
-      <div className="border-t p-3">
+      <div className="shrink-0 border-t p-3">
         <div className="flex items-center gap-3 px-2 py-2">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
             {initials(user.username)}
@@ -128,33 +128,35 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AppSidebar() {
   return (
-    <>
-      <aside className="hidden w-64 shrink-0 border-r bg-background lg:block">
-        <div className="sticky top-0 h-svh">
-          <SidebarNav />
-        </div>
-      </aside>
-
-      <div className="sticky top-0 z-40 flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur lg:hidden">
-        <Sheet>
-          <SheetTrigger
-            render={<Button variant="ghost" size="icon" aria-label="Open menu" />}
-          >
-            <Menu className="size-5" />
-          </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0">
-            <SheetTitle className="sr-only">Navigation</SheetTitle>
-            <SidebarNav />
-          </SheetContent>
-        </Sheet>
-
-        <Link href="/" className="flex items-center gap-2 font-medium">
-          <GraduationCap className="size-5" />
-          LMS
-        </Link>
-
-        <span className="w-9" />
+    <aside className="hidden w-64 shrink-0 border-r bg-background lg:block">
+      <div className="sticky top-0 h-svh">
+        <SidebarNav />
       </div>
-    </>
+    </aside>
+  );
+}
+
+export function AppMobileBar() {
+  return (
+    <div className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between border-b bg-background/80 px-4 backdrop-blur lg:hidden">
+      <Sheet>
+        <SheetTrigger
+          render={<Button variant="ghost" size="icon" aria-label="Open menu" />}
+        >
+          <Menu className="size-5" />
+        </SheetTrigger>
+        <SheetContent side="left" className="w-64 p-0">
+          <SheetTitle className="sr-only">Navigation</SheetTitle>
+          <SidebarNav />
+        </SheetContent>
+      </Sheet>
+
+      <Link href="/dashboard" className="flex items-center gap-2 font-medium">
+        <GraduationCap className="size-5" />
+        LMS
+      </Link>
+
+      <span className="w-9" />
+    </div>
   );
 }
