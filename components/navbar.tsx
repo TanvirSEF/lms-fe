@@ -7,6 +7,7 @@ import { ArrowRight, GraduationCap, LogIn, LogOut, UserPlus } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import { LinkButton } from '@/components/link-button';
 import { useAuth } from '@/components/providers/auth-provider';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -36,6 +37,7 @@ export function Navbar() {
         </div>
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          <ThemeToggle />
           {user ? (
             <>
               <span className="hidden text-sm text-muted-foreground sm:block">

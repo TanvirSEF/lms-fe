@@ -9,7 +9,6 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
-  Newspaper,
   PencilLine,
   ShieldCheck,
 } from 'lucide-react';
@@ -18,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/components/providers/auth-provider';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { UserRole } from '@/lib/api';
 
 type NavItem = {
@@ -26,10 +26,7 @@ type NavItem = {
   icon: typeof BookOpen;
 };
 
-const commonItems: NavItem[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/blog', label: 'Blog', icon: Newspaper },
-];
+const commonItems: NavItem[] = [{ href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard }];
 
 const roleItems: Record<UserRole, NavItem[]> = {
   student: [
@@ -109,6 +106,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
               {user.userRole.replaceAll('_', ' ')}
             </Badge>
           </div>
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="icon"
@@ -156,7 +154,7 @@ export function AppMobileBar() {
         LMS
       </Link>
 
-      <span className="w-9" />
+      <ThemeToggle />
     </div>
   );
 }
