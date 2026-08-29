@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PasswordInput } from '@/components/ui/password-input';
 import { useAuth } from '@/components/providers/auth-provider';
 
 export function LoginForm() {
@@ -54,10 +55,9 @@ export function LoginForm() {
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               required
               autoComplete="current-password"
             />
