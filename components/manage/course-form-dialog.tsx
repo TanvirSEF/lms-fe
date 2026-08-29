@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -14,11 +14,22 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/components/providers/auth-provider';
 import { uploadFile } from '@/lib/api';
 import {
   createCourse,
+  fetchInstructors,
   updateCourse,
+  type CourseInput,
+  type InstructorOption,
   type ManageCourse,
 } from '@/lib/manage';
 
@@ -33,11 +44,27 @@ export function CourseFormDialog({
   course?: ManageCourse | null;
   onSaved: () => void;
 }) {
+  const { user } = useAuth();
+  const canAssignInstructor =
+    user?.userRole === 'admin' || user?.userRole === 'content_manager';
+
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [coverUrl, setCoverUrl] = useState(course?.coverUrl ?? '');
   const [uploading, setUploading] = useState(false);
+  const [instructors, setInstructors] = useState<InstructorOption[] | null>(null);
+  const [instructorId, setInstructorId] = useState<number | null>(
+    course?.instructor?.id ?? null
+  );
   const editing = Boolean(course);
+
+  useEffect(() => {
+    if (!canAssignInstructor) return;
+
+    fetchInstructors()
+      .then(setInstructors)
+      .catch(() => setInstructors([]));
+  }, [canAssignInstructor]);
 
   async function handleCoverChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -64,11 +91,15 @@ export function CourseFormDialog({
     setError('');
 
     const form = new FormData(event.currentTarget);
-    const input = {
+    const input: CourseInput = {
       title: String(form.get('title')),
       description: String(form.get('description') || ''),
       coverUrl,
     };
+
+    if (canAssignInstructor) {
+      input.instructor = instructorId;
+    }
 
     try {
       if (editing && course) {
@@ -116,6 +147,35 @@ export function CourseFormDialog({
               defaultValue={course?.description ?? ''}
             />
           </div>
+          {canAssignInstructor && (
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="course-instructor">Instructor</Label>
+              <Select
+                value={instructorId === null ? 'unassigned' : String(instructorId)}
+                onValueChange={(value) =>
+                  setInstructorId(value === 'unassigned' ? null : Number(value))
+                }
+              >
+                <SelectTrigger id="course-instructor">
+                  <SelectValue placeholder="Select an instructor" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unassigned">Unassigned</SelectItem>
+                  {(instructors ?? []).map((instructor) => (
+                    <SelectItem key={instructor.id} value={String(instructor.id)}>
+                      {instructor.username}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {instructors !== null && instructors.length === 0 && (
+                <p className="text-xs text-muted-foreground">
+                  No instructors yet — promote a user to instructor from the Admin
+                  panel first.
+                </p>
+              )}
+            </div>
+          )}
           <div className="flex flex-col gap-2">
             <Label htmlFor="coverFile">Cover image</Label>
             {coverUrl && (

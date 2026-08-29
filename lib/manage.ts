@@ -26,7 +26,7 @@ export type ManageCourse = {
   title: string;
   description: string | null;
   coverUrl: string | null;
-  instructor: { username: string } | null;
+  instructor: { id: number; username: string } | null;
   lessons: ManageLesson[];
   quizzes: ManageQuiz[];
 };
@@ -41,6 +41,13 @@ export type CourseInput = {
   title: string;
   description?: string;
   coverUrl?: string;
+  instructor?: number | null;
+};
+
+export type InstructorOption = {
+  id: number;
+  documentId: string;
+  username: string;
 };
 
 export type LessonInput = {
@@ -53,6 +60,11 @@ export type LessonInput = {
 
 export async function fetchManageCourses(): Promise<ManageCourse[]> {
   const res = await api<{ data: ManageCourse[] }>('/courses/manage');
+  return res.data;
+}
+
+export async function fetchInstructors(): Promise<InstructorOption[]> {
+  const res = await api<{ data: InstructorOption[] }>('/courses/instructors');
   return res.data;
 }
 
