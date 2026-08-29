@@ -1,7 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2, ShieldCheck, ShieldX } from 'lucide-react';
+import {
+  ArrowRight,
+  BookOpen,
+  GraduationCap,
+  LayoutDashboard,
+  Loader2,
+  PenLine,
+  ShieldCheck,
+  ShieldX,
+} from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,10 +21,31 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { LinkButton } from '@/components/link-button';
 import { useAuth } from '@/components/providers/auth-provider';
-import { api } from '@/lib/api';
+import { api, UserRole } from '@/lib/api';
 
 type AccessState = 'idle' | 'checking' | 'allowed' | 'denied';
+
+const quickLinks: Record<UserRole, { href: string; label: string; icon: typeof BookOpen }[]> = {
+  student: [
+    { href: '/my-courses', label: 'My courses', icon: GraduationCap },
+    { href: '/courses', label: 'Browse courses', icon: BookOpen },
+  ],
+  instructor: [
+    { href: '/manage', label: 'Manage my courses', icon: PenLine },
+    { href: '/courses', label: 'Browse courses', icon: BookOpen },
+  ],
+  content_manager: [
+    { href: '/manage', label: 'Manage courses', icon: PenLine },
+    { href: '/blog/manage', label: 'Blog admin', icon: BookOpen },
+  ],
+  admin: [
+    { href: '/admin', label: 'Admin panel', icon: LayoutDashboard },
+    { href: '/manage', label: 'Manage courses', icon: PenLine },
+    { href: '/blog/manage', label: 'Blog admin', icon: BookOpen },
+  ],
+};
 
 export function DashboardContent() {
   const { user } = useAuth();
@@ -31,10 +61,14 @@ export function DashboardContent() {
     }
   }
 
+  const links = user ? quickLinks[user.userRole] : [];
+
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-medium tracking-tight">Hello, {user?.username}</h1>
+    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-2xl font-medium tracking-tight">
+          Hello, {user?.username}
+        </h1>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>You are logged in as</span>
           <Badge variant="outline" className="capitalize">
@@ -43,12 +77,32 @@ export function DashboardContent() {
         </div>
       </div>
 
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {links.map((link) => (
+          <LinkButton
+            key={link.href}
+            href={link.href}
+            variant="outline"
+            className="h-auto w-full justify-start gap-3 px-5 py-4 text-left"
+          >
+            <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <link.icon className="size-4" />
+            </span>
+            <span className="flex flex-1 flex-col items-start">
+              <span className="text-sm font-medium">{link.label}</span>
+            </span>
+            <ArrowRight className="size-4 text-muted-foreground" />
+          </LinkButton>
+        ))}
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Access check</CardTitle>
           <CardDescription>
-            Calls GET /api/rbac-check on the backend. Only instructor, content manager
-            and admin roles are allowed.
+            Calls GET /api/rbac-check on the backend. Only instructor, content
+            manager and admin roles pass — students are rejected with 403 by
+            the server, not by hiding the button.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">

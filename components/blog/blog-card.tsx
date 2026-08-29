@@ -7,7 +7,7 @@ import type { BlogPost } from '@/lib/blog';
 export function BlogCard({ post }: { post: BlogPost }) {
   return (
     <Link href={`/blog/${post.documentId}`} className="group">
-      <Card className="h-full transition-colors group-hover:border-ring">
+      <Card className="h-full gap-0 py-0 transition-all group-hover:-translate-y-0.5 group-hover:shadow-md">
         {post.coverUrl && (
           <div className="aspect-[2/1] overflow-hidden rounded-t-xl">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -18,7 +18,7 @@ export function BlogCard({ post }: { post: BlogPost }) {
             />
           </div>
         )}
-        <CardHeader>
+        <CardHeader className="pt-5">
           <div className="flex items-start justify-between gap-2">
             <CardTitle className="text-lg">{post.title}</CardTitle>
             <ArrowUpRight className="size-4 shrink-0 text-muted-foreground" />
