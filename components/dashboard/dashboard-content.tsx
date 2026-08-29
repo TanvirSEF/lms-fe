@@ -161,38 +161,40 @@ export function DashboardContent() {
         )
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Access check</CardTitle>
-          <CardDescription>
-            Calls GET /api/rbac-check on the backend. Only instructor, content
-            manager and admin roles pass — students are rejected with 403 by
-            the server, not by hiding the button.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <Button onClick={checkAccess} disabled={access === 'checking'} className="w-fit">
-            {access === 'checking' ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <ShieldCheck className="size-4" />
+      {user?.userRole !== 'admin' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Access check</CardTitle>
+            <CardDescription>
+              Calls GET /api/rbac-check on the backend. Only instructor, content
+              manager and admin roles pass — students are rejected with 403 by
+              the server, not by hiding the button.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <Button onClick={checkAccess} disabled={access === 'checking'} className="w-fit">
+              {access === 'checking' ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <ShieldCheck className="size-4" />
+              )}
+              Check my access
+            </Button>
+            {access === 'allowed' && (
+              <p className="flex items-center gap-2 text-sm text-green-600">
+                <ShieldCheck className="size-4" />
+                Allowed. The backend accepted your role.
+              </p>
             )}
-            Check my access
-          </Button>
-          {access === 'allowed' && (
-            <p className="flex items-center gap-2 text-sm text-green-600">
-              <ShieldCheck className="size-4" />
-              Allowed. The backend accepted your role.
-            </p>
-          )}
-          {access === 'denied' && (
-            <p className="flex items-center gap-2 text-sm text-destructive">
-              <ShieldX className="size-4" />
-              Denied. The backend returned 403 for your role.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+            {access === 'denied' && (
+              <p className="flex items-center gap-2 text-sm text-destructive">
+                <ShieldX className="size-4" />
+                Denied. The backend returned 403 for your role.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
