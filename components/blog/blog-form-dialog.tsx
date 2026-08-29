@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { uploadFile } from '@/lib/api';
 import { createPost, updatePost, type BlogPost } from '@/lib/blog';
 
 export function BlogFormDialog({
@@ -41,7 +42,27 @@ export function BlogFormDialog({
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const editing = Boolean(post);
+
+  async function handleCoverChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!file) return;
+
+    setUploading(true);
+    setError('');
+
+    try {
+      const uploaded = await uploadFile(file);
+      setCoverUrl(uploaded.url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  }
 
   useEffect(() => {
     if (!open) {
@@ -121,13 +142,32 @@ export function BlogFormDialog({
           </div>
           <div className="grid grid-cols-[1fr_150px] gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="cover-url">Cover image URL</Label>
+              <Label htmlFor="cover-url">Cover image</Label>
+              {coverUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={coverUrl}
+                  alt="Cover preview"
+                  className="h-24 w-full rounded-lg border object-cover"
+                />
+              )}
+              <div className="flex items-center gap-2">
+                <Input
+                  id="cover-file"
+                  type="file"
+                  accept="image/*"
+                  disabled={uploading}
+                  onChange={handleCoverChange}
+                  className="flex-1"
+                />
+                {uploading && <Loader2 className="size-4 shrink-0 animate-spin text-muted-foreground" />}
+              </div>
               <Input
                 id="cover-url"
-                type="url"
-                placeholder="https://example.com/image.jpg"
+                placeholder="…or paste an image URL"
                 value={coverUrl}
                 onChange={(event) => setCoverUrl(event.target.value)}
+                className="text-xs text-muted-foreground"
               />
             </div>
             <div className="flex flex-col gap-2">

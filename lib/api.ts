@@ -48,6 +48,32 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
   return (await res.json()) as T;
 }
 
+export type UploadedFile = {
+  id: number;
+  name: string;
+  url: string;
+};
+
+export async function uploadFile(file: File): Promise<UploadedFile> {
+  const token = getToken();
+  const body = new FormData();
+  body.append('files', file);
+
+  const res = await fetch(`${API_URL}/api/upload`, {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    body,
+  });
+
+  if (!res.ok) {
+    const data = (await res.json().catch(() => null)) as ApiError | null;
+    throw new Error(data?.error?.message || `Upload failed with status ${res.status}`);
+  }
+
+  const files = (await res.json()) as UploadedFile[];
+  return files[0];
+}
+
 export function login(identifier: string, password: string) {
   return api<AuthResponse>('/auth/local', {
     method: 'POST',

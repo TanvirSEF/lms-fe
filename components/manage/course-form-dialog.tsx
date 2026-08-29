@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { uploadFile } from '@/lib/api';
 import {
   createCourse,
   updateCourse,
@@ -34,7 +35,28 @@ export function CourseFormDialog({
 }) {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [coverUrl, setCoverUrl] = useState(course?.coverUrl ?? '');
+  const [uploading, setUploading] = useState(false);
   const editing = Boolean(course);
+
+  async function handleCoverChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!file) return;
+
+    setUploading(true);
+    setError('');
+
+    try {
+      const uploaded = await uploadFile(file);
+      setCoverUrl(uploaded.url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -45,7 +67,7 @@ export function CourseFormDialog({
     const input = {
       title: String(form.get('title')),
       description: String(form.get('description') || ''),
-      coverUrl: String(form.get('coverUrl') || ''),
+      coverUrl,
     };
 
     try {
@@ -95,13 +117,32 @@ export function CourseFormDialog({
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="coverUrl">Cover image URL</Label>
+            <Label htmlFor="coverFile">Cover image</Label>
+            {coverUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={coverUrl}
+                alt="Cover preview"
+                className="h-32 w-full rounded-lg border object-cover"
+              />
+            )}
+            <div className="flex items-center gap-2">
+              <Input
+                id="coverFile"
+                type="file"
+                accept="image/*"
+                disabled={uploading}
+                onChange={handleCoverChange}
+                className="flex-1"
+              />
+              {uploading && <Loader2 className="size-4 shrink-0 animate-spin text-muted-foreground" />}
+            </div>
             <Input
               id="coverUrl"
-              name="coverUrl"
-              type="url"
-              placeholder="https://example.com/cover.jpg"
-              defaultValue={course?.coverUrl ?? ''}
+              value={coverUrl}
+              onChange={(event) => setCoverUrl(event.target.value)}
+              placeholder="…or paste an image URL"
+              className="text-xs text-muted-foreground"
             />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
