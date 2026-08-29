@@ -20,25 +20,33 @@ export type BlogInput = {
 const API_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
 
 export async function getPublishedPosts(): Promise<BlogPost[]> {
-  const res = await fetch(`${API_URL}/api/blogs`, { cache: 'no-store' });
+  try {
+    const res = await fetch(`${API_URL}/api/blogs`, { cache: 'no-store' });
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return [];
+    }
+
+    const json = await res.json();
+    return json.data;
+  } catch {
     return [];
   }
-
-  const json = await res.json();
-  return json.data;
 }
 
 export async function getPublishedPost(documentId: string): Promise<BlogPost | null> {
-  const res = await fetch(`${API_URL}/api/blogs/${documentId}`, { cache: 'no-store' });
+  try {
+    const res = await fetch(`${API_URL}/api/blogs/${documentId}`, { cache: 'no-store' });
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return null;
+    }
+
+    const json = await res.json();
+    return json.data;
+  } catch {
     return null;
   }
-
-  const json = await res.json();
-  return json.data;
 }
 
 export async function fetchManagePosts(): Promise<BlogPost[]> {
