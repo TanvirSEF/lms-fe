@@ -50,6 +50,19 @@ export type InstructorOption = {
   username: string;
 };
 
+export type CourseStudent = {
+  documentId: string;
+  username: string;
+  enrolledAt: string;
+  completed: number;
+  percent: number;
+};
+
+export type CourseStudents = {
+  total: number;
+  students: CourseStudent[];
+};
+
 export type LessonInput = {
   title: string;
   content?: string;
@@ -65,6 +78,11 @@ export async function fetchManageCourses(): Promise<ManageCourse[]> {
 
 export async function fetchInstructors(): Promise<InstructorOption[]> {
   const res = await api<{ data: InstructorOption[] }>('/courses/instructors');
+  return res.data;
+}
+
+export async function fetchCourseStudents(documentId: string): Promise<CourseStudents> {
+  const res = await api<{ data: CourseStudents }>(`/courses/${documentId}/students`);
   return res.data;
 }
 

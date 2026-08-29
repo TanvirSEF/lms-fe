@@ -8,6 +8,7 @@ import {
   Loader2,
   Pencil,
   Plus,
+  Users,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/components/providers/auth-provider';
 import { CourseFormDialog } from '@/components/manage/course-form-dialog';
+import { CourseStudentsDialog } from '@/components/manage/course-students-dialog';
 import { DeleteButton } from '@/components/manage/delete-button';
 import { LessonFormDialog } from '@/components/manage/lesson-form-dialog';
 import { QuizFormDialog } from '@/components/manage/quiz-form-dialog';
@@ -48,6 +50,10 @@ export function ManageContent() {
     course: ManageCourse | null;
     quiz: ManageQuiz | null;
   }>({ open: false, course: null, quiz: null });
+  const [studentsDialog, setStudentsDialog] = useState<{
+    open: boolean;
+    course: ManageCourse | null;
+  }>({ open: false, course: null });
 
   const reload = async () => {
     try {
@@ -150,6 +156,14 @@ export function ManageContent() {
                           <ChevronRight className="size-3.5" />
                         )}
                         Lessons
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setStudentsDialog({ open: true, course })}
+                      >
+                        <Users className="size-3.5" />
+                        Students
                       </Button>
                       <Button
                         variant="ghost"
@@ -291,6 +305,12 @@ export function ManageContent() {
         courseDocumentId={quizDialog.course?.documentId ?? ''}
         quiz={quizDialog.quiz}
         onSaved={reload}
+      />
+      <CourseStudentsDialog
+        key={`students-${studentsDialog.course?.documentId ?? 'none'}-${studentsDialog.open}`}
+        open={studentsDialog.open}
+        onOpenChange={(open) => setStudentsDialog((prev) => ({ ...prev, open }))}
+        course={studentsDialog.course}
       />
     </div>
   );

@@ -157,7 +157,14 @@ export function CourseFormDialog({
                 }
               >
                 <SelectTrigger id="course-instructor">
-                  <SelectValue placeholder="Select an instructor" />
+                  <SelectValue placeholder="Select an instructor">
+                    {() =>
+                      instructorId === null
+                        ? 'Unassigned'
+                        : (instructors?.find((i) => i.id === instructorId)?.username ??
+                          'Loading…')
+                    }
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="unassigned">Unassigned</SelectItem>

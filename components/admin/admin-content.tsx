@@ -112,7 +112,7 @@ export function AdminContent() {
                         onValueChange={(value) => handleRoleChange(row, value as UserRole)}
                       >
                         <SelectTrigger>
-                          <SelectValue />
+                          <SelectValue>{() => roleLabels[row.userRole]}</SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {roleOptions.map(([value, label]) => (

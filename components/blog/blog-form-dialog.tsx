@@ -154,7 +154,9 @@ export function BlogFormDialog({
               <Label>Status</Label>
               <Select value={status} onValueChange={(value) => setStatus(value as 'draft' | 'published')}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue>
+                    {() => (status === 'draft' ? 'Draft' : 'Published')}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="draft">Draft</SelectItem>

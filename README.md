@@ -15,11 +15,13 @@ Next.js frontend for a Learning Management System: browse and enroll in courses,
 ## Features
 
 - Auth: register (joins as student), login, role-aware navbar, protected pages
-- Courses: public browse + detail (SSR), enroll flow
-- Learning: course player with lesson sequence, text and video lessons, mark complete
-- Progress: per course percent, persisted per student, visible in My Courses
+- Courses: public browse + detail (SSR), enroll flow, cover image upload
+- Learning: course player with lesson sequence, text and video lessons (upload or URL), mark complete
+- Progress: per course percent, persisted per student, visible in My Courses and the dashboard
 - Quizzes: MCQ taking, instant score, per question review, retake, attempt history
 - Manage panel: courses, lessons and quizzes CRUD for instructors (own) and admins / CMs (all)
+  - admins / CMs can assign an instructor when creating or editing a course
+  - enrolled students list with per-student progress percent (instructors see their own courses)
 - Blog: published list + single post (SSR, public), draft / publish workflow for admins / CMs
 - Admin panel: platform stats and user role management (admin only)
 
