@@ -21,6 +21,11 @@ function toEmbedUrl(url: string) {
   return match ? `https://www.youtube.com/embed/${match[1]}` : null;
 }
 
+function toDirectVideoUrl(url: string) {
+  if (/\/video\/upload\//.test(url)) return url;
+  return /\.(mp4|webm|ogv|ogg|mov)(\?|#|$)/i.test(url) ? url : null;
+}
+
 function LessonView({
   lesson,
   completed,
@@ -33,6 +38,8 @@ function LessonView({
   completing: boolean;
 }) {
   const embedUrl = lesson.videoUrl ? toEmbedUrl(lesson.videoUrl) : null;
+  const directVideoUrl =
+    lesson.videoUrl && !embedUrl ? toDirectVideoUrl(lesson.videoUrl) : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -55,7 +62,17 @@ function LessonView({
         </div>
       )}
 
-      {!embedUrl && lesson.videoUrl && (
+      {directVideoUrl && (
+        <video
+          src={directVideoUrl}
+          controls
+          playsInline
+          preload="metadata"
+          className="aspect-video w-full rounded-lg border"
+        />
+      )}
+
+      {!embedUrl && !directVideoUrl && lesson.videoUrl && (
         <a
           href={lesson.videoUrl}
           target="_blank"

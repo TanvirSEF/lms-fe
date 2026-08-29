@@ -15,11 +15,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { uploadFile } from '@/lib/api';
 import {
   createLesson,
   updateLesson,
   type ManageLesson,
 } from '@/lib/manage';
+
+const MAX_VIDEO_MB = 100;
 
 export function LessonFormDialog({
   open,
@@ -38,7 +41,33 @@ export function LessonFormDialog({
 }) {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [videoUrl, setVideoUrl] = useState(lesson?.videoUrl ?? '');
+  const [uploading, setUploading] = useState(false);
   const editing = Boolean(lesson);
+
+  async function handleVideoChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!file) return;
+
+    if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
+      setError(`Video must be under ${MAX_VIDEO_MB}MB — use a YouTube link instead.`);
+      return;
+    }
+
+    setUploading(true);
+    setError('');
+
+    try {
+      const uploaded = await uploadFile(file);
+      setVideoUrl(uploaded.url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -49,7 +78,7 @@ export function LessonFormDialog({
     const input = {
       title: String(form.get('title')),
       content: String(form.get('content') || ''),
-      videoUrl: String(form.get('videoUrl') || ''),
+      videoUrl,
       order: Number(form.get('order') || nextOrder),
     };
 
@@ -90,12 +119,26 @@ export function LessonFormDialog({
           </div>
           <div className="grid grid-cols-[1fr_100px] gap-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="videoUrl">Video URL</Label>
+              <Label htmlFor="videoFile">Video</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  id="videoFile"
+                  type="file"
+                  accept="video/*"
+                  disabled={uploading}
+                  onChange={handleVideoChange}
+                  className="flex-1"
+                />
+                {uploading && (
+                  <Loader2 className="size-4 shrink-0 animate-spin text-muted-foreground" />
+                )}
+              </div>
               <Input
                 id="videoUrl"
-                name="videoUrl"
-                placeholder="https://youtube.com/watch?v=..."
-                defaultValue={lesson?.videoUrl ?? ''}
+                value={videoUrl}
+                onChange={(event) => setVideoUrl(event.target.value)}
+                placeholder="…or paste a YouTube / video URL"
+                className="text-xs text-muted-foreground"
               />
             </div>
             <div className="flex flex-col gap-2">
