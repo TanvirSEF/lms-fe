@@ -130,3 +130,60 @@
     @apply font-sans;
     }
 }
+.role-chart {
+  --rc-bar: #2a78d6;
+  --rc-value: #0b0b0b;
+  --rc-label: #52514e;
+  --rc-grid: rgba(11, 11, 11, 0.08);
+  --rc-axis: rgba(11, 11, 11, 0.22);
+}
+
+.dark .role-chart {
+  --rc-bar: #3987e5;
+  --rc-value: #ffffff;
+  --rc-label: #c3c2b7;
+  --rc-grid: rgba(255, 255, 255, 0.1);
+  --rc-axis: rgba(255, 255, 255, 0.25);
+}
+
+.role-chart-bar {
+  fill: var(--rc-bar);
+  transition: opacity 150ms ease;
+}
+
+.role-chart-group:hover .role-chart-bar {
+  opacity: 0.8;
+}
+
+.role-chart-value {
+  fill: var(--rc-value);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.role-chart-label,
+.role-chart-tick {
+  fill: var(--rc-label);
+  font-size: 11px;
+}
+
+.role-chart-grid {
+  stroke: var(--rc-grid);
+}
+
+.role-chart-axis {
+  stroke: var(--rc-axis);
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.hero-glow {
+  animation: glow-pulse 6s ease-in-out infinite;
+}

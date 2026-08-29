@@ -25,6 +25,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useAuth } from '@/components/providers/auth-provider';
+import { RoleChart } from '@/components/admin/role-chart';
 import { UserRole } from '@/lib/api';
 import { fetchStats, fetchUsers, setUserRole, type AdminStats, type AdminUser } from '@/lib/admin';
 
@@ -105,6 +106,19 @@ export function AdminContent() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      <div className="mt-10 grid gap-4 lg:grid-cols-[380px_1fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Users by role
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RoleChart byRole={stats.users.byRole} />
+          </CardContent>
+        </Card>
       </div>
 
       <h2 className="mb-3 mt-10 font-medium">Users</h2>

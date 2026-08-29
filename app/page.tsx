@@ -14,6 +14,9 @@ import { Footer } from "@/components/footer"
 import { LinkButton } from "@/components/link-button"
 import { getCourses } from "@/lib/courses"
 
+const HERO_IMAGE =
+  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&q=80&auto=format&fit=crop"
+
 const features = [
   {
     icon: BookOpen,
@@ -60,58 +63,89 @@ export default async function Home() {
   const lessonCount = courses.reduce((sum, course) => sum + course.lessons.length, 0)
 
   const stats = [
-    { label: "Courses", value: courses.length },
-    { label: "Lessons", value: lessonCount },
-    { label: "Quizzes", value: courses.length > 0 ? "Included" : "—" },
+    { label: "Courses", value: String(courses.length) },
+    { label: "Lessons", value: String(lessonCount) },
+    { label: "Price", value: "Free" },
   ]
 
   return (
     <div className="flex min-h-svh flex-col">
       <div className="relative overflow-hidden">
-        <div className="pointer-events-none absolute -top-32 left-1/2 -z-10 size-[500px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
+        <div className="hero-glow pointer-events-none absolute -top-32 left-1/4 -z-10 size-[420px] rounded-full bg-primary/10 blur-3xl" />
 
-        <section className="mx-auto flex max-w-5xl flex-col items-center px-4 pb-20 pt-24 text-center">
-          <span className="mb-5 inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs text-muted-foreground">
-            <LayoutDashboard className="size-3.5" />
-            Built with Next.js, Strapi and PostgreSQL
-          </span>
+        <section className="mx-auto grid max-w-5xl items-center gap-12 px-4 pb-16 pt-16 sm:pt-24 lg:grid-cols-2">
+          <div className="flex flex-col items-start gap-5">
+            <span
+              className="animate-in fade-in slide-in-from-bottom-2 duration-500 inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-xs text-muted-foreground"
+              style={{ animationDelay: "0ms" }}
+            >
+              <LayoutDashboard className="size-3.5" />
+              Built with Next.js, Strapi and PostgreSQL
+            </span>
 
-          <h1 className="max-w-3xl text-4xl font-medium tracking-tight sm:text-6xl">
-            Learn at your <span className="text-primary">own pace</span>
-          </h1>
+            <h1
+              className="animate-in fade-in slide-in-from-bottom-3 duration-700 max-w-xl text-4xl font-medium tracking-tight sm:text-5xl"
+              style={{ animationDelay: "80ms" }}
+            >
+              Learn at your <span className="text-primary">own pace</span>
+            </h1>
 
-          <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-            Enroll in courses, track your progress lesson by lesson and prove
-            what you have learned with auto-graded quizzes.
-          </p>
+            <p
+              className="animate-in fade-in slide-in-from-bottom-3 duration-700 max-w-md text-lg leading-relaxed text-muted-foreground"
+              style={{ animationDelay: "160ms" }}
+            >
+              Enroll in courses, track your progress lesson by lesson and prove
+              what you have learned with auto-graded quizzes.
+            </p>
 
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <LinkButton size="lg" href="/courses">
-              Browse courses
-              <ArrowRight className="size-4" />
-            </LinkButton>
-            <LinkButton size="lg" variant="outline" href="/blog">
-              Read the blog
-            </LinkButton>
+            <div
+              className="animate-in fade-in slide-in-from-bottom-3 duration-700 mt-2 flex flex-wrap gap-3"
+              style={{ animationDelay: "240ms" }}
+            >
+              <LinkButton size="lg" href="/courses">
+                Browse courses
+                <ArrowRight className="size-4" />
+              </LinkButton>
+              <LinkButton size="lg" variant="outline" href="/blog">
+                Read the blog
+              </LinkButton>
+            </div>
+
+            <div
+              className="animate-in fade-in slide-in-from-bottom-2 duration-700 mt-4 grid w-full max-w-md grid-cols-3 divide-x rounded-lg border bg-background"
+              style={{ animationDelay: "320ms" }}
+            >
+              {stats.map((stat) => (
+                <div key={stat.label} className="flex flex-col gap-1 px-4 py-3">
+                  <span className="text-lg font-medium tabular-nums">{stat.value}</span>
+                  <span className="text-xs text-muted-foreground">{stat.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-14 grid w-full max-w-lg grid-cols-3 divide-x rounded-lg border bg-background">
-            {stats.map((stat) => (
-              <div key={stat.label} className="flex flex-col gap-1 px-4 py-4">
-                <span className="text-xl font-medium tabular-nums">{stat.value}</span>
-                <span className="text-xs text-muted-foreground">{stat.label}</span>
-              </div>
-            ))}
+          <div
+            className="animate-in fade-in zoom-in-95 duration-700 relative hidden lg:block"
+            style={{ animationDelay: "200ms" }}
+          >
+            <div className="absolute -inset-4 -z-10 rounded-3xl bg-primary/10 blur-2xl" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={HERO_IMAGE}
+              alt="Students learning together with laptops"
+              className="aspect-[4/3] w-full rounded-2xl object-cover ring-1 ring-foreground/10"
+            />
           </div>
         </section>
       </div>
 
       <section className="mx-auto w-full max-w-5xl px-4 pb-20">
         <div className="grid gap-4 sm:grid-cols-3">
-          {features.map((feature) => (
+          {features.map((feature, index) => (
             <div
               key={feature.title}
-              className="group rounded-xl border p-6 transition-all hover:-translate-y-0.5 hover:shadow-sm"
+              className="group animate-in fade-in slide-in-from-bottom-3 duration-700 rounded-xl border p-6 transition-all hover:-translate-y-0.5 hover:shadow-sm"
+              style={{ animationDelay: `${120 * index}ms` }}
             >
               <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <feature.icon className="size-5" />
