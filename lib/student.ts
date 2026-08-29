@@ -12,6 +12,7 @@ export type EnrolledCourse = {
     documentId: string;
     title: string;
     description: string | null;
+    coverUrl: string | null;
     instructor: { username: string } | null;
   };
   progress: CourseProgress;

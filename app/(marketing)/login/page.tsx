@@ -1,6 +1,8 @@
 import { BrandMark } from '@/components/brand-mark';
 import { LoginForm } from '@/components/auth/login-form';
 
+export const metadata = { title: 'Log in' };
+
 export default function LoginPage() {
   return (
     <main className="relative flex min-h-[80svh] flex-col items-center justify-center gap-6 overflow-hidden p-6">

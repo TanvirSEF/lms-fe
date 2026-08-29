@@ -21,6 +21,16 @@ export default async function CourseDetailPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
+      {course.coverUrl && (
+        <div className="mb-8 aspect-[5/2] overflow-hidden rounded-xl border">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={course.coverUrl}
+            alt={course.title}
+            className="size-full object-cover"
+          />
+        </div>
+      )}
       <h1 className="text-3xl font-medium tracking-tight">{course.title}</h1>
       <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
         <span className="flex items-center gap-1.5">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Loader2, RotateCcw, Trophy } from 'lucide-react';
 
@@ -13,6 +13,7 @@ import {
   fetchMyAttempts,
   fetchQuizForTake,
   submitQuiz,
+  type QuizAttempt,
   type QuizResult,
   type TakeQuiz,
 } from '@/lib/student';
@@ -29,19 +30,15 @@ export function QuizContent({
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<QuizResult | null>(null);
-  const [attempts, setAttempts] = useState<{ score: number; total: number; createdAt: string }[]>([]);
+  const [attempts, setAttempts] = useState<QuizAttempt[]>([]);
 
-  function loadAttempts() {
+  const loadAttempts = useCallback(() => {
     fetchMyAttempts()
       .then((all) =>
-        setAttempts(
-          all
-            .filter((attempt) => attempt.quiz.documentId === quizDocumentId)
-            .map(({ score, total, createdAt }) => ({ score, total, createdAt }))
-        )
+        setAttempts(all.filter((attempt) => attempt.quiz.documentId === quizDocumentId))
       )
       .catch(() => setAttempts([]));
-  }
+  }, [quizDocumentId]);
 
   useEffect(() => {
     fetchQuizForTake(quizDocumentId)
@@ -51,7 +48,7 @@ export function QuizContent({
       })
       .catch((err: Error) => setError(err.message));
     loadAttempts();
-  }, [quizDocumentId]);
+  }, [quizDocumentId, loadAttempts]);
 
   async function handleSubmit() {
     if (answers.some((answer) => answer === -1)) {
@@ -204,7 +201,7 @@ export function QuizContent({
           <ul className="flex flex-col divide-y rounded-lg border text-sm">
             {attempts.map((attempt, index) => (
               <li
-                key={attempt.createdAt}
+                key={attempt.documentId}
                 className="flex items-center justify-between px-4 py-2.5"
               >
                 <span className="text-muted-foreground">

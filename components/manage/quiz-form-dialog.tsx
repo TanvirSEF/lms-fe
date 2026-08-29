@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -40,33 +40,19 @@ export function QuizFormDialog({
   quiz?: ManageQuiz | null;
   onSaved: () => void;
 }) {
-  const [title, setTitle] = useState('');
-  const [questions, setQuestions] = useState<QuestionDraft[]>([emptyQuestion()]);
-  const [error, setError] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const editing = Boolean(quiz);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    setError('');
-
-    if (quiz) {
-      setTitle(quiz.title);
-      setQuestions(
-        quiz.questions.map((question) => ({
+  const [title, setTitle] = useState(quiz?.title ?? '');
+  const [questions, setQuestions] = useState<QuestionDraft[]>(
+    quiz
+      ? quiz.questions.map((question) => ({
           text: question.text,
           options: [...question.options, '', '', '', ''].slice(0, 4),
           correctIndex: question.correctIndex,
         }))
-      );
-    } else {
-      setTitle('');
-      setQuestions([emptyQuestion()]);
-    }
-  }, [open, quiz]);
+      : [emptyQuestion()]
+  );
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const editing = Boolean(quiz);
 
   function updateQuestion(index: number, patch: Partial<QuestionDraft>) {
     setQuestions((prev) =>

@@ -1,6 +1,8 @@
 import { CourseCard } from '@/components/courses/course-card';
 import { getCourses } from '@/lib/courses';
 
+export const metadata = { title: 'Courses' };
+
 export const dynamic = 'force-dynamic';
 
 export default async function CoursesPage() {

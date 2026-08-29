@@ -1,6 +1,8 @@
 import { BlogCard } from '@/components/blog/blog-card';
 import { getPublishedPosts } from '@/lib/blog';
 
+export const metadata = { title: 'Blog' };
+
 export const dynamic = 'force-dynamic';
 
 export default async function BlogPage() {

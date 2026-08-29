@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -36,10 +36,10 @@ export function BlogFormDialog({
   post?: BlogPost | null;
   onSaved: () => void;
 }) {
-  const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
-  const [coverUrl, setCoverUrl] = useState('');
-  const [status, setStatus] = useState<'draft' | 'published'>('draft');
+  const [title, setTitle] = useState(post?.title ?? '');
+  const [body, setBody] = useState(post?.body ?? '');
+  const [coverUrl, setCoverUrl] = useState(post?.coverUrl ?? '');
+  const [status, setStatus] = useState<'draft' | 'published'>(post?.status ?? 'draft');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -63,26 +63,6 @@ export function BlogFormDialog({
       setUploading(false);
     }
   }
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    setError('');
-
-    if (post) {
-      setTitle(post.title);
-      setBody(post.body ?? '');
-      setCoverUrl(post.coverUrl ?? '');
-      setStatus(post.status);
-    } else {
-      setTitle('');
-      setBody('');
-      setCoverUrl('');
-      setStatus('draft');
-    }
-  }, [open, post]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

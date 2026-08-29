@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Loader2, Pencil, Plus } from 'lucide-react';
+import { Loader2, Newspaper, Pencil, Plus } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,14 +16,16 @@ export function BlogManageContent() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<BlogPost | null>(null);
 
-  const reload = useCallback(async () => {
+  const reload = async () => {
     const data = await fetchManagePosts();
     setPosts(data);
-  }, []);
+  };
 
   useEffect(() => {
-    reload().catch(() => setPosts([]));
-  }, [reload]);
+    fetchManagePosts()
+      .then(setPosts)
+      .catch(() => setPosts([]));
+  }, []);
 
   async function handleDelete(documentId: string) {
     await deletePost(documentId);
@@ -71,7 +73,19 @@ export function BlogManageContent() {
             <Card key={post.documentId}>
               <CardHeader>
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
+                  <CardTitle className="flex items-center gap-3 text-lg">
+                    {post.coverUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={post.coverUrl}
+                        alt=""
+                        className="h-10 w-16 shrink-0 rounded-md border object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-10 w-16 shrink-0 items-center justify-center rounded-md border bg-muted/40">
+                        <Newspaper className="size-4 text-muted-foreground/60" />
+                      </span>
+                    )}
                     {post.title}
                     <Badge
                       variant={post.status === 'published' ? 'default' : 'secondary'}
@@ -110,6 +124,7 @@ export function BlogManageContent() {
       )}
 
       <BlogFormDialog
+        key={`post-${editing?.documentId ?? 'new'}-${dialogOpen}`}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         post={editing}

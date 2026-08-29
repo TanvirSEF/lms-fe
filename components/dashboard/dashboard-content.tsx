@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   BookOpen,
   ClipboardCheck,
   GraduationCap,
   Loader2,
+  PencilLine,
   ShieldCheck,
   ShieldX,
   Users,
@@ -20,11 +22,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { LinkButton } from '@/components/link-button';
 import { RoleChart } from '@/components/admin/role-chart';
 import { useAuth } from '@/components/providers/auth-provider';
 import { api } from '@/lib/api';
 import { fetchStats, type AdminStats } from '@/lib/admin';
+import { fetchManageCourses, type ManageCourse } from '@/lib/manage';
+import { fetchMyCourses, type EnrolledCourse } from '@/lib/student';
 
 type AccessState = 'idle' | 'checking' | 'allowed' | 'denied';
 
@@ -115,6 +120,152 @@ function AdminOverview({ stats }: { stats: AdminStats }) {
   );
 }
 
+function CourseCover({
+  src,
+  title,
+  className,
+}: {
+  src: string | null | undefined;
+  title: string;
+  className?: string;
+}) {
+  if (src) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={src} alt={title} className={`size-full object-cover ${className ?? ''}`} />
+    );
+  }
+
+  return (
+    <div className={`flex size-full items-center justify-center bg-muted/40 ${className ?? ''}`}>
+      <BookOpen className="size-5 text-muted-foreground/60" />
+    </div>
+  );
+}
+
+function StudentOverview() {
+  const [courses, setCourses] = useState<EnrolledCourse[] | null>(null);
+
+  useEffect(() => {
+    fetchMyCourses()
+      .then(setCourses)
+      .catch(() => setCourses([]));
+  }, []);
+
+  if (!courses) {
+    return (
+      <div className="flex justify-center py-10">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (courses.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">No enrollments yet</CardTitle>
+          <CardDescription>
+            Browse the catalog and enroll in a course to start learning.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <LinkButton href="/courses">
+            <BookOpen className="size-4" />
+            Browse courses
+          </LinkButton>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <h2 className="text-lg font-medium">Continue learning</h2>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {courses.map(({ course, progress }) => (
+          <Link key={course.documentId} href={`/my-courses/${course.documentId}`} className="group">
+            <Card className="h-full gap-0 overflow-hidden p-0 transition-colors group-hover:border-ring/50">
+              <div className="aspect-[5/2] border-b">
+                <CourseCover src={course.coverUrl} title={course.title} />
+              </div>
+              <div className="flex flex-col gap-2 p-4">
+                <p className="text-sm font-medium leading-snug">{course.title}</p>
+                <Progress value={progress.percent} />
+                <p className="text-xs tabular-nums text-muted-foreground">
+                  {progress.completed}/{progress.total} lessons · {progress.percent}%
+                </p>
+              </div>
+            </Card>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ManageOverview() {
+  const [courses, setCourses] = useState<ManageCourse[] | null>(null);
+
+  useEffect(() => {
+    fetchManageCourses()
+      .then(setCourses)
+      .catch(() => setCourses([]));
+  }, []);
+
+  if (!courses) {
+    return (
+      <div className="flex justify-center py-10">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-lg font-medium">Courses</h2>
+        <LinkButton href="/manage" variant="outline" size="sm">
+          <PencilLine className="size-4" />
+          Manage
+        </LinkButton>
+      </div>
+      {courses.length === 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">No courses yet</CardTitle>
+            <CardDescription>
+              Create your first course, add lessons and build a quiz.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LinkButton href="/manage">Go to manage</LinkButton>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {courses.map((course) => (
+            <Link key={course.documentId} href="/manage" className="group">
+              <Card className="h-full gap-0 overflow-hidden p-0 transition-colors group-hover:border-ring/50">
+                <div className="aspect-[5/2] border-b">
+                  <CourseCover src={course.coverUrl} title={course.title} />
+                </div>
+                <div className="flex flex-col gap-1 p-4">
+                  <p className="text-sm font-medium leading-snug">{course.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {course.lessons.length} lessons · {course.quizzes.length} quizzes
+                    {course.instructor ? ` · by ${course.instructor.username}` : ''}
+                  </p>
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function DashboardContent() {
   const { user } = useAuth();
   const [access, setAccess] = useState<AccessState>('idle');
@@ -161,7 +312,13 @@ export function DashboardContent() {
         )
       )}
 
-      {user?.userRole !== 'admin' && (
+      {user?.userRole === 'student' && <StudentOverview />}
+
+      {(user?.userRole === 'instructor' || user?.userRole === 'content_manager') && (
+        <ManageOverview />
+      )}
+
+      {user?.userRole === 'student' && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Access check</CardTitle>

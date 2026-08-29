@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, GraduationCap, Loader2 } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { fetchMyCourses, type EnrolledCourse } from '@/lib/student';
 
@@ -51,14 +51,26 @@ export function MyCoursesContent() {
         <div className="grid gap-4 sm:grid-cols-2">
           {courses.map(({ course, progress }) => (
             <Link key={course.documentId} href={`/my-courses/${course.documentId}`} className="group">
-              <Card className="h-full transition-colors group-hover:border-ring">
-                <CardHeader>
+              <Card className="h-full gap-0 overflow-hidden p-0 transition-colors group-hover:border-ring">
+                <div className="aspect-[5/2] border-b">
+                  {course.coverUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={course.coverUrl}
+                      alt={course.title}
+                      className="size-full object-cover transition-transform group-hover:scale-[1.02]"
+                    />
+                  ) : (
+                    <div className="flex size-full items-center justify-center bg-muted/40">
+                      <GraduationCap className="size-6 text-muted-foreground/60" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col gap-2 p-4">
                   <CardTitle className="flex items-center justify-between gap-2 text-lg">
                     {course.title}
                     <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
                   </CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-2">
                   {course.instructor && (
                     <p className="text-sm text-muted-foreground">
                       {course.instructor.username}
@@ -73,7 +85,7 @@ export function MyCoursesContent() {
                   <p className="text-xs text-muted-foreground">
                     {progress.completed} of {progress.total} lessons completed
                   </p>
-                </CardContent>
+                </div>
               </Card>
             </Link>
           ))}

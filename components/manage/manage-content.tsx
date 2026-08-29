@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   BookOpen,
   ChevronDown,
@@ -49,18 +49,23 @@ export function ManageContent() {
     quiz: ManageQuiz | null;
   }>({ open: false, course: null, quiz: null });
 
-  const reload = useCallback(async () => {
+  const reload = async () => {
     try {
       const data = await fetchManageCourses();
       setCourses(data);
+    } catch {
+      setCourses([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
-    reload();
-  }, [reload]);
+    fetchManageCourses()
+      .then(setCourses)
+      .catch(() => setCourses([]))
+      .finally(() => setLoading(false));
+  }, []);
 
   async function handleDeleteCourse(documentId: string) {
     await deleteCourse(documentId);
@@ -115,7 +120,19 @@ export function ManageContent() {
               <Card key={course.documentId}>
                 <CardHeader>
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <CardTitle className="flex items-center gap-2 text-lg">
+                    <CardTitle className="flex items-center gap-3 text-lg">
+                      {course.coverUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={course.coverUrl}
+                          alt=""
+                          className="h-10 w-16 shrink-0 rounded-md border object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-10 w-16 shrink-0 items-center justify-center rounded-md border bg-muted/40">
+                          <BookOpen className="size-4 text-muted-foreground/60" />
+                        </span>
+                      )}
                       {course.title}
                       <Badge variant="outline" className="font-normal">
                         {course.lessons.length} lessons
@@ -252,12 +269,14 @@ export function ManageContent() {
       )}
 
       <CourseFormDialog
+        key={`course-${courseDialog.course?.documentId ?? 'new'}-${courseDialog.open}`}
         open={courseDialog.open}
         onOpenChange={(open) => setCourseDialog((prev) => ({ ...prev, open }))}
         course={courseDialog.course}
         onSaved={reload}
       />
       <LessonFormDialog
+        key={`lesson-${lessonDialog.lesson?.documentId ?? lessonDialog.course?.documentId ?? 'new'}-${lessonDialog.open}`}
         open={lessonDialog.open}
         onOpenChange={(open) => setLessonDialog((prev) => ({ ...prev, open }))}
         courseDocumentId={lessonDialog.course?.documentId ?? ''}
@@ -266,6 +285,7 @@ export function ManageContent() {
         onSaved={reload}
       />
       <QuizFormDialog
+        key={`quiz-${quizDialog.quiz?.documentId ?? quizDialog.course?.documentId ?? 'new'}-${quizDialog.open}`}
         open={quizDialog.open}
         onOpenChange={(open) => setQuizDialog((prev) => ({ ...prev, open }))}
         courseDocumentId={quizDialog.course?.documentId ?? ''}

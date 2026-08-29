@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import {
@@ -36,14 +36,16 @@ export function AdminContent() {
   const [users, setUsers] = useState<AdminUser[] | null>(null);
   const [error, setError] = useState('');
 
-  const reload = useCallback(async () => {
+  const reload = async () => {
     const usersData = await fetchUsers();
     setUsers(usersData);
-  }, []);
+  };
 
   useEffect(() => {
-    reload().catch((err: Error) => setError(err.message));
-  }, [reload]);
+    fetchUsers()
+      .then(setUsers)
+      .catch((err: Error) => setError(err.message));
+  }, []);
 
   async function handleRoleChange(target: AdminUser, userRole: UserRole) {
     setError('');

@@ -1,6 +1,8 @@
 import { BrandMark } from '@/components/brand-mark';
 import { RegisterForm } from '@/components/auth/register-form';
 
+export const metadata = { title: 'Register' };
+
 export default function RegisterPage() {
   return (
     <main className="relative flex min-h-[80svh] flex-col items-center justify-center gap-6 overflow-hidden p-6">

@@ -1,4 +1,5 @@
-import { Geist, Geist_Mono, DM_Sans } from "next/font/google"
+import type { Metadata } from "next"
+import { Geist_Mono, DM_Sans } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -11,6 +12,15 @@ const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 })
+
+export const metadata: Metadata = {
+  title: {
+    default: "LMS — Learn. Teach. Grow.",
+    template: "%s | LMS",
+  },
+  description:
+    "A learning platform with courses, lessons, quizzes and a blog — enroll, track your progress and keep learning.",
+}
 
 export default function RootLayout({
   children,
