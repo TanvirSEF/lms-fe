@@ -182,7 +182,7 @@ export function PlayerContent({ courseDocumentId }: { courseDocumentId: string }
                 Lessons
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col gap-1">
+            <CardContent className="flex max-h-56 flex-col gap-1 overflow-y-auto lg:max-h-none lg:overflow-visible">
               {course.lessons.map((lesson) => {
                 const done = completedIds.includes(lesson.documentId);
                 const active = lesson.documentId === activeLessonId;

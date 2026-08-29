@@ -75,8 +75,8 @@ export function AdminContent() {
 
       {error && <p className="mb-3 text-sm text-destructive">{error}</p>}
 
-      <div className="rounded-lg border">
-        <Table>
+      <div className="overflow-x-auto rounded-lg border">
+        <Table className="min-w-[560px]">
           <TableHeader>
             <TableRow>
               <TableHead>Username</TableHead>
